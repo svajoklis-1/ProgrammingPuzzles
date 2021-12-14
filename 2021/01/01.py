@@ -1,5 +1,4 @@
 import argparse
-import functools
 
 def part_one(in_file_name):
   in_file = open(in_file_name, 'r')
@@ -50,7 +49,7 @@ def part_two(in_file_name):
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Puzzle 01')
-  parser.add_argument('--part', choices=['one', 'two'])
+  parser.add_argument('--part', choices=['one', 'two'], required=True)
   parser.add_argument('in_file')
   args = parser.parse_args()
 
