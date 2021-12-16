@@ -97,7 +97,6 @@ def part_two(in_file_name):
 
 	basins.sort()
 	print(reduce(lambda acc, v: acc * v, basins[-3:]))
-	print(map.data)
 
 
 if __name__ == '__main__':
