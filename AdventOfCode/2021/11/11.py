@@ -3,8 +3,6 @@ from dataclasses import dataclass
 from functools import reduce
 import colorama
 
-colorama.ansi.clear_screen()
-
 
 class Map:
 	def __init__(self):
@@ -118,8 +116,6 @@ class Map:
 		print()
 
 
-
-
 def part_one(in_file_name):
 	in_file = open(in_file_name, 'r')
 
@@ -143,7 +139,7 @@ def part_two(in_file_name):
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='Puzzle 10')
+	parser = argparse.ArgumentParser(description='Puzzle 11')
 	parser.add_argument('--part', choices=['one', 'two'], required=True)
 	parser.add_argument('in_file')
 	args = parser.parse_args()
