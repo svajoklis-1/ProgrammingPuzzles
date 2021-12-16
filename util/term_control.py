@@ -75,36 +75,45 @@ ESC = chr(27)
 class TermControl:
     @staticmethod
     def clear():
+        '''Clear terminal.'''
         os.system('cls' if os.name == 'nt' else 'clear')
 
     @staticmethod
     def control(control_string):
+        '''Print a control sequence by prepending the escape character.'''
         print(ESC + control_string, end='')
 
     @staticmethod
     def set_foreground(color: TermColor):
+        '''Sets foreground color.'''
         print(ESC + ForegroundColorMap[color], end='')
 
     @staticmethod
     def set_background(color: TermColor):
+        '''Sets background color.'''
         print(ESC + BackgroundColorMap[color], end='')
 
     @staticmethod
     def reset_color():
+        '''Resets terminal styles.'''
         print(ESC + RESET, end='')
 
     @staticmethod
     def move_cursor_up(amount: int):
+        '''Moves terminal cursor up by amount.'''
         print(ESC + f'[{amount}A', end='')
 
     @staticmethod
     def move_cursor_down(amount: int):
+        '''Moves terminal cursor down by amount.'''
         print(ESC + f'[{amount}B', end='')
 
     @staticmethod
     def move_cursor_right(amount: int):
+        '''Moves terminal cursor right by amount.'''
         print(ESC + f'[{amount}C', end='')
 
     @staticmethod
     def move_cursor_left(amount: int):
+        '''Moves terminal cursor left by amount.'''
         print(ESC + f'[{amount}D', end='')
