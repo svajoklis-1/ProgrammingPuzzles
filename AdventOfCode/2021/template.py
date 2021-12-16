@@ -8,11 +8,11 @@ import colorama
 
 
 def part_one(in_file_name):
-    in_file = open(in_file_name, 'r')
+	in_file = open(in_file_name, 'r')
 
 
 def part_two(in_file_name):
-    in_file = open(in_file_name, 'r')
+	in_file = open(in_file_name, 'r')
 
 
 if __name__ == '__main__':

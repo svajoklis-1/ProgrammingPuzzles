@@ -1,21 +1,42 @@
 import sys
-sys.path.append('../../../')
-
 import argparse
+
 from dataclasses import dataclass
 from functools import reduce
-from util.term_control import TermControl
+
+sys.path.append('../../../')
+
+from util.term_control import TermControl, TermColor # pylint: disable=wrong-import-position,import-error
 
 
-TermControl.clear()
+class Cave:
+	def __init__(self, name):
+		self.name = name
+		self.adjacent = []
+
+
+	def append_adjacent(self, cave):
+		if not cave in self.adjacent:
+			self.adjacent.append(cave)
+
+
+class CaveMap:
+	def __init__(self):
+		self.cave_by_name = {}
 
 
 def part_one(in_file_name):
-	in_file = open(in_file_name, 'r')
+	with open(in_file_name, 'r', encoding='utf-8') as in_file:
+		cave_map = CaveMap()
+		for line in in_file:
+			[name_a, name_b] = line.strip().split('-')
+			cave_a = cave_map.cave_by_name.get(cave_a, Cave(name_a))
+			cave_b = cave_map.cave_by_name.get(cave_b, Cave(name_b))
 
 
 def part_two(in_file_name):
-	in_file = open(in_file_name, 'r')
+	with open(in_file_name, 'r') as in_file:
+		pass
 
 
 if __name__ == '__main__':

@@ -10,8 +10,8 @@ num 	num_digits 	idx		got
 3		5			4
 5		5			5
 
-0		6			6   y
-6		6			7   y
+0		6			6		y
+6		6			7		y
 9		6			8		y
 
 8		7			9		y
