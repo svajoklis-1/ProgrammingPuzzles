@@ -159,7 +159,7 @@ def part_two(in_file_name):
 
 
 if __name__ == '__main__':
-	parser = argparse.ArgumentParser(description='Puzzle 07')
+	parser = argparse.ArgumentParser(description='Puzzle 08')
 	parser.add_argument('--part', choices=['one', 'two'], required=True)
 	parser.add_argument('in_file')
 	args = parser.parse_args()
