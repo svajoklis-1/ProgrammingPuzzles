@@ -5,7 +5,8 @@
           "!Module"
       ],
       "editor.wordBasedSuggestions": false,
-      "editor.tabSize": 4
+      "editor.tabSize": 4,
+      "editor.formatOnSave": true
   },
   "python.linting.pylintEnabled": true,
   "python.linting.enabled": true
