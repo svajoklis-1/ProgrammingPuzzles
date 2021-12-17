@@ -7,8 +7,9 @@
       "editor.wordBasedSuggestions": false,
       "editor.tabSize": 4,
       "editor.formatOnSave": true,
-      "editor.insertSpaces": true
+      "editor.insertSpaces": true,
   },
   "python.linting.pylintEnabled": true,
-  "python.linting.enabled": true
+  "python.linting.enabled": true,
+  "files.insertFinalNewline": false
 }

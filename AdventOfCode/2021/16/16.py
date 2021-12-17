@@ -124,12 +124,12 @@ def count_versions(packet: Packet) -> int:
     return sum
 
 
-def part_one(in_file_name):
+def part_one(in_file, out_file):
     with open(in_file_name, 'r', encoding='utf-8') as in_file:
         hex_data = in_file.readline().strip()
         stream = BitStream.from_hex_data(hex_data)
         packet = read_packet(stream)
-        print(count_versions(packet))
+        out_file.write(str(count_versions(packet)))
 
 
 def evaluate_sub_packets(sub_packets: list[Packet]):
@@ -151,20 +151,29 @@ def evaluate_expression(packet: Packet) -> int:
         case 5:  # greater-than
             values = evaluate_sub_packets(packet.sub_packets)
             return 1 if values[0] > values[1] else 0
-        case 6:  # greater-than
+        case 6:  # less-than
             values = evaluate_sub_packets(packet.sub_packets)
             return 1 if values[0] < values[1] else 0
-        case 7:  # greater-than
+        case 7:  # equal-to
             values = evaluate_sub_packets(packet.sub_packets)
             return 1 if values[0] == values[1] else 0
 
 
-def part_two(in_file_name):
-    with open(in_file_name, 'r', encoding='utf-8') as in_file:
-        hex_data = in_file.readline().strip()
-        stream = BitStream.from_hex_data(hex_data)
-        packet = read_packet(stream)
-        print(evaluate_expression(packet))
+def part_two(in_file, out_file):
+    hex_data = in_file.readline().strip()
+    stream = BitStream.from_hex_data(hex_data)
+    packet = read_packet(stream)
+    out_file.write(str(evaluate_expression(packet)))
+
+
+def main(in_file, part):
+    with open(f'{in_file}.in', 'r', encoding='utf-8') as in_file:
+        with open(f'{in_file}.{part}.out', 'w', encoding='utf-8') as out_file:
+            match part:
+                case 'one':
+                    part_one(in_file, out_file)
+                case 'two':
+                    part_two(in_file, out_file)
 
 
 if __name__ == '__main__':
@@ -173,8 +182,4 @@ if __name__ == '__main__':
     parser.add_argument('in_file')
     args = parser.parse_args()
 
-    match args.part:
-        case 'one':
-            part_one(args.in_file)
-        case 'two':
-            part_two(args.in_file)
+    main(args.in_file, args.part)
