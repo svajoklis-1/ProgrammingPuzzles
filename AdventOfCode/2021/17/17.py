@@ -20,14 +20,46 @@ def part_one(in_file: FileIO, out_file: FileIO):
     for coord in coords:
         coord[1] = coord[1].split('..')
 
-    x_min = coords[0][1][0]
-    x_max = coords[0][1][1]
-    y_min = coords[1][1][0]
-    y_max = coords[1][1][1]
+    x_min = int(coords[0][1][0])
+    x_max = int(coords[0][1][1])
+    y_min = int(coords[1][1][0])
+    y_max = int(coords[1][1][1])
 
-    vxi = 1
-    passed_x = False
-    while not passed_x:
+    print(x_min, x_max, y_min, y_max)
+
+    highest_vyi = 0
+
+    vyi = 0
+    highest_y = 0
+    done = False
+    while not done:
+        vy = vyi
+        y = 0
+        py = 0
+
+        while y > y_min:
+            y += vy
+            if y > highest_y:
+                highest_y = y
+            vy -= 1
+
+            if y < y_min:
+                if py > y_max:
+                    pass
+                else:
+                    highest_vyi = vyi
+                    vyi += 1
+                    print('New high', highest_vyi)
+                    print('Highest y', highest_y)
+
+                break
+
+            py = y
+
+        vyi += 1
+        highest_y = 0
+
+    print(highest_vyi)
 
 
 def main(file_name, part):
