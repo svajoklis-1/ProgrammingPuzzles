@@ -2,10 +2,11 @@ from io import FileIO
 from os import stat
 import sys
 import argparse
+from math import floor, ceil
 
 from dataclasses import dataclass
 from functools import reduce
-from enum import Enum, auto as iota
+from enum import Enum, auto
 
 import re
 
@@ -16,54 +17,83 @@ from util.term_control import TermControl, TermColor  # pylint: disable=wrong-im
 
 
 class Direction(Enum):
-    LEFT = iota()
-    RIGHT = iota()
+    LEFT = auto()
+    RIGHT = auto()
 
 
 num_re = re.compile(r'(\d+).*')
 
 
-class SnailNumber:
-    '''
-    Represents a single SnailNumber of two sides.
-    If a side is a SnailNumber *_number is the number and *_value is None.
-    If a side is a value *_number is None and *_value is the value.
-    '''
-    left_number: 'SnailNumber'
-    right_number: 'SnailNumber'
-
-    left_value: int
-    right_value: int
-
-    parent: 'SnailNumber'
+class SnailNode:
+    parent: 'SnailPair'
 
     def __init__(self):
-        self.left_number = None
-        self.right_number = None
-
-        self.left_value = None
-        self.right_value = None
-
         self.parent = None
 
-    def __str__(self):
-        left = self.left_number
-        if not left:
-            left = self.left_value
+    def find_splittable(self) -> 'SnailValue':
+        pass
 
-        right = self.right_number
-        if not right:
-            right = self.right_value
+    def get_magnitude(self) -> int:
+        return 0
+
+    def clone(self) -> 'SnailNode':
+        pass
+
+
+class SnailValue(SnailNode):
+    value: int
+
+    def __init__(self, value: int):
+        super().__init__()
+        self.value = value
+
+    def __str__(self):
+        return f'{self.value}'
+
+    def get_leaves(self):
+        return [self]
+
+    def find_splittable(self):
+        if self.value >= 10:
+            return self
+        return None
+
+    def get_magnitude(self):
+        return self.value
+
+    def clone(self):
+        return SnailValue(self.value)
+
+
+class SnailPair(SnailNode):
+    '''
+    Represents a single SnailPair of two sides.
+    '''
+    left: SnailNode
+    right: SnailNode
+
+    def __init__(self, left=None, right=None):
+        super().__init__()
+        self.left = left
+        if left:
+            left.parent = self
+        self.right = right
+        if right:
+            right.parent = self
+
+    def __str__(self):
+        left = self.left
+        right = self.right
 
         return f'[{left},{right}]'
 
-    def add(self, other):
-        result = SnailNumber()
+    def add(self, other: 'SnailPair'):
+        result = SnailPair()
 
-        result.left_number = self
-        result.left_number.parent = result
-        result.right_number = other
-        result.right_number.parent = result
+        result.left = self
+        result.left.parent = result
+        result.right = other
+        result.right.parent = result
 
         result.reduce()
 
@@ -76,39 +106,78 @@ class SnailNumber:
                 explodable.explode()
                 continue
 
+            splittable = self.find_splittable()
+            if splittable:
+                new_pair = SnailPair(SnailValue(floor(splittable.value / 2.0)),
+                                     SnailValue(ceil(splittable.value / 2.0)))
+                splittable.parent.replace(splittable, new_pair)
+                continue
+
             break
         pass
 
-    def find_explodable(self, depth=0) -> 'SnailNumber':
-        if depth == 3:
-            if self.left_number:
-                return self.left_number
-            if self.right_number:
-                return self.right_number
+    def find_splittable(self):
+        return self.left.find_splittable() or self.right.find_splittable()
 
-        result = self.left_number and self.left_number.find_explodable(depth + 1)
+    def find_explodable(self, depth=0) -> 'SnailPair':
+        if depth == 3:
+            if isinstance(self.left, SnailPair):
+                return self.left
+            if isinstance(self.right, SnailPair):
+                return self.right
+
+        result = isinstance(self.left, SnailPair) and self.left.find_explodable(depth + 1)
         if result:
             return result
 
-        result = self.right_number and self.right_number.find_explodable(depth + 1)
+        result = isinstance(self.right, SnailPair) and self.right.find_explodable(depth + 1)
         if result:
             return result
 
         return None
 
     def explode(self):
-        # add to the left
-        # add to the right
+        new_val = SnailValue(0)
+        new_val.parent = self.parent
+        self.parent.replace(self, new_val)
 
-        if self == self.parent.left_number:
-            self.parent.left_number = None
-            self.parent.left_value = 0
-        if self == self.parent.right_number:
-            self.parent.right_number = None
-            self.parent.right_value = 0
+        root = self
+        while root.parent:
+            root = root.parent
+
+        leaves = root.get_leaves()
+        new_idx = leaves.index(new_val)
+
+        if new_idx > 0:
+            leaves[new_idx - 1].value += self.left.value
+        if new_idx < len(leaves) - 1:
+            leaves[new_idx + 1].value += self.right.value
+
+    def replace(self, what: SnailNode, replacement: SnailNode):
+        if self.left == what:
+            self.left = replacement
+            replacement.parent = self
+        elif self.right == what:
+            self.right = replacement
+            replacement.parent = self
+
+    def get_leaves(self) -> list[SnailValue]:
+        leaves = self.left.get_leaves() + self.right.get_leaves()
+        return leaves
+
+    def get_magnitude(self):
+        return 3 * self.left.get_magnitude() + 2 * self.right.get_magnitude()
+
+    def clone(self):
+        result = SnailPair()
+        result.left = self.left.clone()
+        result.left.parent = result
+        result.right = self.right.clone()
+        result.right.parent = result
+        return result
 
 
-class SnailNumberParser:
+class SnailPairParser:
     string: str
     current_index: int
 
@@ -116,28 +185,24 @@ class SnailNumberParser:
         self.string = string
         self.current_index = 0
 
-    def read_number(self):
-        char = self.read_char()
+    def read_pair(self):
+        char = self.peek_char()
         if char != '[':
-            raise 'Unexpected character, expected ['
+            return None
 
-        number = SnailNumber()
+        self.read_char()
 
-        if self.peek_char() == '[':
-            number.left_number = self.read_number()
-            number.left_number.parent = number
-        else:
-            number.left_value = self.read_value()
+        number = SnailPair()
+
+        number.left = self.read_node()
+        number.left.parent = number
 
         char = self.read_char()
         if char != ',':
             raise 'Unexpected character, expected ,'
 
-        if self.peek_char() == '[':
-            number.right_number = self.read_number()
-            number.right_number.parent = number
-        else:
-            number.right_value = self.read_value()
+        number.right = self.read_node()
+        number.right.parent = number
 
         char = self.read_char()
         if char != ']':
@@ -147,12 +212,24 @@ class SnailNumberParser:
 
     def read_value(self):
         num_match = num_re.match(self.string[self.current_index:])
-        if num_match:
-            value_str = num_match.group(1)
-            self.current_index += len(value_str)
-            return int(value_str)
 
-        raise 'Expected to read a numerical value'
+        if not num_match:
+            return None
+
+        value_str = num_match.group(1)
+        self.current_index += len(value_str)
+        return SnailValue(int(value_str))
+
+    def read_node(self):
+        pair = self.read_pair()
+        if pair:
+            return pair
+
+        value = self.read_value()
+        if value:
+            return value
+
+        return None
 
     def peek_char(self):
         return self.string[self.current_index]
@@ -165,11 +242,43 @@ class SnailNumberParser:
 
 def part_one(in_file: FileIO, out_file: FileIO):
     num_string = in_file.readline().strip()
-    parser = SnailNumberParser(num_string)
-    snail_num = parser.read_number()
+    snail_num = SnailPairParser(num_string).read_node()
     print(snail_num)
-    print(snail_num.reduce())
+    while line := in_file.readline().strip():
+        snail_num = snail_num.add(SnailPairParser(line).read_node())
+
     print(snail_num)
+    out_file.write(str(snail_num.get_magnitude()))
+
+
+def part_two(in_file: FileIO, out_file: FileIO):
+    numbers: list[SnailPair] = []
+    while num_string := in_file.readline().strip():
+        numbers.append(SnailPairParser(num_string).read_node())
+
+    for num in numbers:
+        print(num)
+
+    max_magnitude = 0
+    for i in range(len(numbers)):
+        for j in range(i + 1, len(numbers)):
+            i_num = numbers[i].clone()
+            j_num = numbers[j].clone()
+
+            num_sum = i_num.add(j_num)
+            magnitude = num_sum.get_magnitude()
+            if magnitude > max_magnitude:
+                max_magnitude = magnitude
+
+            i_num = numbers[i].clone()
+            j_num = numbers[j].clone()
+
+            num_sum = j_num.add(i_num)
+            magnitude = num_sum.get_magnitude()
+            if magnitude > max_magnitude:
+                max_magnitude = magnitude
+
+    out_file.write(str(max_magnitude))
 
 
 def main(file_name, part):
