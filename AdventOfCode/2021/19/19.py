@@ -17,6 +17,10 @@ from util.term_control import TermControl, TermColor  # pylint: disable=wrong-im
 
 
 class Vec2:
+    '''
+    Represents a two dimensional vector.
+    '''
+
     x: int
     y: int
 
@@ -28,9 +32,11 @@ class Vec2:
         return f'({self.x},{self.y})'
 
     def clone(self) -> 'Vec2':
+        '''Create a new copy of the vector.'''
         return Vec2(self.x, self.y)
 
     def remap(self, remap: str) -> 'Vec2':
+        '''Returns a new vector where coordinates have been remapped with remap.'''
         new_vec = self.clone()
 
         match remap[1]:
@@ -56,46 +62,63 @@ class Vec2:
         return new_vec
 
     def subtract(self, other: 'Vec2'):
+        '''Returns a new vector with result of `self - other`.'''
         return Vec2(self.x - other.x, self.y - other.y)
 
     def add(self, other: 'Vec2'):
+        '''Returns a new vector with result of `self + other`.'''
         return Vec2(self.x + other.x, self.y + other.y)
 
     def equal(self, other: 'Vec2'):
+        '''Returns true if vectors are equal.'''
         return self.x == other.x and self.y == other.y
 
     def distance_to(self, other):
-        return sqrt(pow(self.x - other.x, 2), pow(self.y - other.y))
+        '''Returns distance between vectors.'''
+        return sqrt(pow(self.x - other.x, 2), pow(self.y - other.y, 2))
 
 
 class Vec2Map:
+    '''
+        Represents a vector map.
+    '''
     vectors: list[Vec2]
+    origin: Vec2
 
     def __init__(self):
         self.vectors = []
+        self.origin = Vec2(0, 0)
 
     def append(self, vec: Vec2):
+        '''Appends vector to end of vector map.'''
         self.vectors.append(vec)
 
     def remap(self, remap: str) -> 'Vec2Map':
+        '''Creates a new vector map with `remap` applied to all vectors.'''
         new_map = self.clone()
-        for i in range(len(new_map.vectors)):
+        for (i, _) in enumerate(new_map.vectors):
             new_map.vectors[i] = new_map.vectors[i].remap(remap)
+        new_map.origin = new_map.origin.remap(remap)
         return new_map
 
     def clone(self) -> 'Vec2Map':
+        '''Creates a new copy of the vector map.'''
         new_map = Vec2Map()
         for vec in self.vectors:
             new_map.append(vec.clone())
+        new_map.origin = self.origin.clone()
         return new_map
 
-    def translate(self, translation) -> 'Vec2Map':
+    def translate(self, translation: Vec2) -> 'Vec2Map':
+        '''Creates a new copy of the vector map with all vectors translated by `translation`.'''
         new_map = self.clone()
-        for i in range(len(new_map.vectors)):
+        for (i, _) in enumerate(new_map.vectors):
             new_map.vectors[i] = new_map.vectors[i].add(translation)
+        new_map.origin = new_map.origin.add(translation)
         return new_map
 
     def match_points(self, other: 'Vec2Map'):
+        '''Returns a number of vectors that have an equal vector in `other`.'''
         self_vectors = self.vectors.copy()
         other_vectors = other.vectors.copy()
         matches = 0
@@ -126,45 +149,49 @@ class Vec2Map:
         return result
 
 
-remaps2 = []
+def make_remaps():
+    '''Creates a list of 2d remaps.'''
+    remaps = []
 
-for coords in ['xy', 'yx']:
-    for signs in ['++', '-+', '+-', '--']:
-        remap = ''
-        for i in range(2):
-            remap = remap + f'{signs[i]}{coords[i]}'
-        remaps2.append(remap)
+    for coords in ['xy', 'yx']:
+        for signs in ['++', '-+', '+-', '--']:
+            remap = ''
+            for i in range(2):
+                remap = remap + f'{signs[i]}{coords[i]}'
+            remaps.append(remap)
+
+    return remaps
 
 
 def part_one(in_file, out_file):
+    remaps = make_remaps()
+
     scanners: list[Vec2Map] = []
 
     scanner = Vec2Map()
     scanner.append(Vec2(0, 2))
-    # scanner.append(Vec2(4, 1))
-    # scanner.append(Vec2(3, 3))
+    scanner.append(Vec2(4, 1))
+    scanner.append(Vec2(3, 3))
     scanners.append(scanner)
 
     scanner = Vec2Map()
     scanner.append(Vec2(-1, -1))
-    # scanner.append(Vec2(-5, 0))
-    # scanner.append(Vec2(-2, 1))
+    scanner.append(Vec2(-5, 0))
+    scanner.append(Vec2(-2, 1))
     scanners.append(scanner)
 
-    for remap in remaps2:
-        print('remap', remap)
+    for remap in remaps:
         vecsb = scanners[1].remap(remap)
         for vecb in vecsb.vectors:
             for veca in scanners[0].vectors:
-                translation = vecb.subtract(veca)
-                print('translation', translation)
+                translation = veca.subtract(vecb)
                 tvecsb = vecsb.translate(translation)
-                print(scanners[0])
-                print(tvecsb)
-                print()
-                # matches = scanners[0].match_points(tvecsb)
-                # if matches > 0:
-                #     print(matches)
+                matches = scanners[0].match_points(tvecsb)
+                if matches > 1:
+                    print('remap', remap)
+                    print('b origin', tvecsb.origin)
+                    print(matches)
+        print()
 
 
 def main(file_name, part):
