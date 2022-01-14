@@ -2,13 +2,14 @@ from io import FileIO
 from os import stat
 import sys
 import argparse
-from math import floor, ceil, sqrt
+from math import cos, floor, ceil, pi, radians, sin, sqrt
 
 from dataclasses import dataclass
 from functools import reduce
 from enum import Enum, auto
 
 import re
+from typing import TextIO
 
 INFINITY = 9223372036854775805
 
@@ -16,26 +17,28 @@ sys.path.append('../../../')
 from util.term_control import TermControl, TermColor  # pylint: disable=wrong-import-position,import-error
 
 
-class Vec2:
+class Vec3:
     '''
     Represents a two dimensional vector.
     '''
 
     x: int
     y: int
+    z: int
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, z):
         self.x = x
         self.y = y
+        self.z = z
 
     def __str__(self):
-        return f'({self.x},{self.y})'
+        return f'({self.x},{self.y},{self.z})'
 
-    def clone(self) -> 'Vec2':
+    def clone(self) -> 'Vec3':
         '''Create a new copy of the vector.'''
-        return Vec2(self.x, self.y)
+        return Vec3(self.x, self.y, self.z)
 
-    def remap(self, remap: str) -> 'Vec2':
+    def remap(self, remap: str) -> 'Vec3':
         '''Returns a new vector where coordinates have been remapped with remap.'''
         new_vec = self.clone()
 
@@ -44,6 +47,8 @@ class Vec2:
                 new_vec.x = self.x
             case 'y':
                 new_vec.x = self.y
+            case 'z':
+                new_vec.x = self.z
 
         match remap[0]:
             case '-':
@@ -54,46 +59,65 @@ class Vec2:
                 new_vec.y = self.x
             case 'y':
                 new_vec.y = self.y
+            case 'z':
+                new_vec.y = self.z
 
         match remap[2]:
             case '-':
                 new_vec.y = -new_vec.y
 
+        match remap[5]:
+            case 'x':
+                new_vec.z = self.x
+            case 'y':
+                new_vec.z = self.y
+            case 'z':
+                new_vec.z = self.z
+
+        match remap[4]:
+            case '-':
+                new_vec.z = -new_vec.z
+
         return new_vec
 
-    def subtract(self, other: 'Vec2'):
+    def subtract(self, other: 'Vec3'):
         '''Returns a new vector with result of `self - other`.'''
-        return Vec2(self.x - other.x, self.y - other.y)
+        return Vec3(self.x - other.x, self.y - other.y, self.z - other.z)
 
-    def add(self, other: 'Vec2'):
+    def add(self, other: 'Vec3'):
         '''Returns a new vector with result of `self + other`.'''
-        return Vec2(self.x + other.x, self.y + other.y)
+        return Vec3(self.x + other.x, self.y + other.y, self.z + other.z)
 
-    def equal(self, other: 'Vec2'):
+    def equal(self, other: 'Vec3'):
         '''Returns true if vectors are equal.'''
-        return self.x == other.x and self.y == other.y
+        return self.x == other.x and self.y == other.y and self.z == other.z
 
-    def distance_to(self, other):
+    def distance_to(self, other: 'Vec3'):
         '''Returns distance between vectors.'''
-        return sqrt(pow(self.x - other.x, 2), pow(self.y - other.y, 2))
+        return sqrt(pow(other.x - self.x, 2) + pow(other.y - self.y, 2) + pow(other.z - self.z, 2))
+
+    def __eq__(self, other: 'Vec3'):
+        return self.equal(other)
 
 
-class Vec2Map:
+class Vec3Map:
     '''
         Represents a vector map.
     '''
-    vectors: list[Vec2]
-    origin: Vec2
+    vectors: list[Vec3]
+    origin: Vec3
+    aligned: bool
 
     def __init__(self):
         self.vectors = []
-        self.origin = Vec2(0, 0)
+        self.origin = Vec3(0, 0, 0)
+        self.aligned = False
 
-    def append(self, vec: Vec2):
+    def append(self, vec: Vec3):
         '''Appends vector to end of vector map.'''
         self.vectors.append(vec)
 
-    def remap(self, remap: str) -> 'Vec2Map':
+    def remap(self, remap: str) -> 'Vec3Map':
         '''Creates a new vector map with `remap` applied to all vectors.'''
         new_map = self.clone()
         for (i, _) in enumerate(new_map.vectors):
@@ -101,15 +125,15 @@ class Vec2Map:
         new_map.origin = new_map.origin.remap(remap)
         return new_map
 
-    def clone(self) -> 'Vec2Map':
+    def clone(self) -> 'Vec3Map':
         '''Creates a new copy of the vector map.'''
-        new_map = Vec2Map()
+        new_map = Vec3Map()
         for vec in self.vectors:
             new_map.append(vec.clone())
         new_map.origin = self.origin.clone()
         return new_map
 
-    def translate(self, translation: Vec2) -> 'Vec2Map':
+    def translate(self, translation: Vec3) -> 'Vec3Map':
         '''Creates a new copy of the vector map with all vectors translated by `translation`.'''
         new_map = self.clone()
         for (i, _) in enumerate(new_map.vectors):
@@ -117,7 +141,7 @@ class Vec2Map:
         new_map.origin = new_map.origin.add(translation)
         return new_map
 
-    def match_points(self, other: 'Vec2Map'):
+    def match_points(self, other: 'Vec3Map'):
         '''Returns a number of vectors that have an equal vector in `other`.'''
         self_vectors = self.vectors.copy()
         other_vectors = other.vectors.copy()
@@ -151,10 +175,10 @@ class Vec2Map:
 
 def make_remaps():
     '''Creates a list of 2d remaps.'''
-    remaps = []
+    remaps = []  # xyz
 
-    for coords in ['xy', 'yx']:
-        for signs in ['++', '-+', '+-', '--']:
+    for coords in ['xyz', 'yxz', 'zxy']:
+        for signs in ['+++', '++-', '+-+', '+--', '-++', '-+-', '--+', '---']:
             remap = ''
             for i in range(2):
                 remap = remap + f'{signs[i]}{coords[i]}'
@@ -163,35 +187,261 @@ def make_remaps():
     return remaps
 
 
-def part_one(in_file, out_file):
-    remaps = make_remaps()
+class Matrix:
+    '''A mathematical matrix.'''
+    values: list[int]
+    width: int
+    height: int
 
-    scanners: list[Vec2Map] = []
+    @staticmethod
+    def make(width: int, height: int, val: int = 0) -> 'Matrix':
+        values = []
+        for i in range(height):
+            row = []
+            for j in range(width):
+                row.append(val)
+            values.append(row)
+        return Matrix(values)
 
-    scanner = Vec2Map()
-    scanner.append(Vec2(0, 2))
-    scanner.append(Vec2(4, 1))
-    scanner.append(Vec2(3, 3))
-    scanners.append(scanner)
+    @staticmethod
+    def from_vector(vec: Vec3) -> 'Matrix':
+        return Matrix([
+            [vec.x],
+            [vec.y],
+            [vec.z]
+        ])
 
-    scanner = Vec2Map()
-    scanner.append(Vec2(-1, -1))
-    scanner.append(Vec2(-5, 0))
-    scanner.append(Vec2(-2, 1))
-    scanners.append(scanner)
+    def to_vector(self) -> Vec3:
+        if not (self.height == 3 and self.width == 1):
+            assert False, 'Converting incompatible matrix to vector'
+        return Vec3(round(self.values[0][0]), round(self.values[1][0]), round(self.values[2][0]))
 
-    for remap in remaps:
-        vecsb = scanners[1].remap(remap)
-        for vecb in vecsb.vectors:
-            for veca in scanners[0].vectors:
-                translation = veca.subtract(vecb)
-                tvecsb = vecsb.translate(translation)
-                matches = scanners[0].match_points(tvecsb)
-                if matches > 1:
-                    print('remap', remap)
-                    print('b origin', tvecsb.origin)
-                    print(matches)
+    def __init__(self, values: list[list[int]]):
+        self.values = values
+        self.width = len(values[0])
+        self.height = len(values)
+
+    def print(self):
+        for row in self.values:
+            for col in row:
+                print(f'{col} ', end='')
+            print()
         print()
+
+    def multiply(self, other: 'Matrix'):
+        if self.width != other.height:
+            assert False, 'Multiplying matrices of incompatible sizes'
+
+        sz = self.width
+
+        result = []
+        for i in range(self.height):
+            row = []
+            for j in range(other.width):
+                cell_result = 0
+                for s in range(sz):
+                    cell_result += self.values[i][s] * other.values[s][j]
+                row.append(cell_result)
+            result.append(row)
+
+        return Matrix(result)
+
+
+def print_matrices():
+    for axis in 'xyz':
+        for degrees in [radians(0), radians(90), radians(180), radians(270)]:
+            print(round(sin(degrees)))
+
+
+def rx(x: float, v: Vec3) -> Vec3:
+    mata = Matrix([
+        [1, 0, 0],
+        [0, cos(x), -sin(x)],
+        [0, sin(x), cos(x)]
+    ])
+    matb = Matrix.from_vector(v)
+
+    return mata.multiply(matb).to_vector()
+
+
+def ry(x: float, v: Vec3) -> Vec3:
+    mata = Matrix([
+        [cos(x), 0, sin(x)],
+        [0, 1, 0],
+        [-sin(x), 0, cos(x)]
+    ])
+    matb = Matrix.from_vector(v)
+
+    return mata.multiply(matb).to_vector()
+
+
+def rz(x: float, v: Vec3) -> Vec3:
+    mata = Matrix([
+        [cos(x), -sin(x), 0],
+        [sin(x), cos(x), 0],
+        [0, 0, 1]
+    ])
+    matb = Matrix.from_vector(v)
+
+    return mata.multiply(matb).to_vector()
+
+
+def vec_to_remap(vec: Vec3):
+    result = ''
+    for a in [vec.x, vec.y, vec.z]:
+        sign = '+' if a > 0 else '-'
+        letter = ''
+        match abs(a):
+            case 1:
+                letter = 'x'
+            case 2:
+                letter = 'y'
+            case 3:
+                letter = 'z'
+        result += f'{sign}{letter}'
+    return result
+
+
+def generate_remaps():
+    remaps = []
+
+    # facing +x
+    a = Vec3(1, 2, 3)
+    remaps.append(vec_to_remap(a))
+
+    a = rx(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = rx(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = rx(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = rx(radians(90), a)
+
+    # facing +z
+    a = ry(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+
+    a = rz(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = rz(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = rz(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = rz(radians(90), a)
+
+    # facing -x
+    a = ry(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+
+    a = rx(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = rx(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = rx(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = rx(radians(-90), a)
+
+    # facing -z
+    a = ry(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+
+    a = rz(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = rz(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = rz(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = rz(radians(-90), a)
+
+    # facing +y
+    a = ry(radians(-90), a)
+    a = rz(radians(90), a)
+    remaps.append(vec_to_remap(a))
+
+    a = ry(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = ry(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = ry(radians(90), a)
+    remaps.append(vec_to_remap(a))
+    a = ry(radians(90), a)
+
+    # facing -y
+    a = rx(radians(180), a)
+    remaps.append(vec_to_remap(a))
+
+    a = ry(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = ry(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = ry(radians(-90), a)
+    remaps.append(vec_to_remap(a))
+    a = ry(radians(-90), a)
+
+    return remaps
+
+
+def part_one(in_file: TextIO, out_file: TextIO):
+    remaps = generate_remaps()
+
+    scanners: list[Vec3Map] = []
+
+    while _ := in_file.readline().strip():
+        scanner = Vec3Map()
+        while coords_line := in_file.readline().strip():
+            coords = [int(x) for x in coords_line.split(',')]
+            scanner.append(Vec3(coords[0], coords[1], coords[2]))
+        scanners.append(scanner)
+
+    scanners[0].aligned = True
+    left_unaligned = len(scanners) - 1
+
+    while left_unaligned > 0:
+        found = False
+        for unalignedi in range(len(scanners)):
+            if scanners[unalignedi].aligned:
+                continue
+            print(f'Aligning {unalignedi}')
+            for alignedi in range(len(scanners)):
+                if not scanners[alignedi].aligned:
+                    continue
+                print(f'  with {alignedi}')
+                for remap in remaps:
+                    vecsb = scanners[unalignedi].remap(remap)
+                    for vecb in vecsb.vectors:
+                        for veca in scanners[alignedi].vectors:
+                            translation = veca.subtract(vecb)
+                            tvecsb = vecsb.translate(translation)
+                            matches = scanners[alignedi].match_points(tvecsb)
+                            if matches == 12:
+                                found = True
+                                tvecsb.aligned = True
+                                scanners[unalignedi] = tvecsb
+                                break
+                        if found:
+                            break
+                    if found:
+                        break
+                if found:
+                    break
+            if found:
+                print(f'  aligned')
+                break
+        if found:
+            left_unaligned -= 1
+            print(f'Left unaligned {left_unaligned}')
+            print()
+
+    all_vecs = []
+    for scanner in scanners:
+        all_vecs += scanner.vectors
+
+    unique_vecs = []
+    for vec in all_vecs:
+        if vec not in unique_vecs:
+            unique_vecs.append(vec)
+
+    print(f'Number of beacons: {len(unique_vecs)}')
 
 
 def main(file_name, part):
