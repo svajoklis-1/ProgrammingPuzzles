@@ -99,6 +99,9 @@ class Vec3:
     def __eq__(self, other: 'Vec3'):
         return self.equal(other)
 
+    def manhattan_distance(self, other: 'Vec3'):
+        return abs(self.x - other.x) + abs(self.y - other.y) + abs(self.z - other.z)
+
 
 class Vec3Map:
     '''
@@ -381,17 +384,8 @@ def generate_remaps():
     return remaps
 
 
-def part_one(in_file: TextIO, out_file: TextIO):
+def align_scanners(scanners: list[Vec3Map]):
     remaps = generate_remaps()
-
-    scanners: list[Vec3Map] = []
-
-    while _ := in_file.readline().strip():
-        scanner = Vec3Map()
-        while coords_line := in_file.readline().strip():
-            coords = [int(x) for x in coords_line.split(',')]
-            scanner.append(Vec3(coords[0], coords[1], coords[2]))
-        scanners.append(scanner)
 
     scanners[0].aligned = True
     left_unaligned = len(scanners) - 1
@@ -432,6 +426,25 @@ def part_one(in_file: TextIO, out_file: TextIO):
             print(f'Left unaligned {left_unaligned}')
             print()
 
+
+def read_scanners(in_file: TextIO):
+    scanners: list[Vec3Map] = []
+
+    while _ := in_file.readline().strip():
+        scanner = Vec3Map()
+        while coords_line := in_file.readline().strip():
+            coords = [int(x) for x in coords_line.split(',')]
+            scanner.append(Vec3(coords[0], coords[1], coords[2]))
+        scanners.append(scanner)
+
+    return scanners
+
+
+def part_one(in_file: TextIO, out_file: TextIO):
+    scanners = read_scanners(in_file)
+
+    align_scanners(scanners)
+
     all_vecs = []
     for scanner in scanners:
         all_vecs += scanner.vectors
@@ -442,6 +455,23 @@ def part_one(in_file: TextIO, out_file: TextIO):
             unique_vecs.append(vec)
 
     print(f'Number of beacons: {len(unique_vecs)}')
+    out_file.write(str(len(unique_vecs)))
+
+
+def part_two(in_file: TextIO, out_file: TextIO):
+    scanners = read_scanners(in_file)
+
+    align_scanners(scanners)
+
+    max_distance = 0
+    for i in range(len(scanners)):
+        for j in range(i + 1, len(scanners)):
+            distance = scanners[i].origin.manhattan_distance(scanners[j].origin)
+            if distance > max_distance:
+                max_distance = distance
+
+    print(f'Longest distance: {max_distance}')
+    out_file.write(str(max_distance))
 
 
 def main(file_name, part):
