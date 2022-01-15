@@ -100,6 +100,7 @@ class Vec3:
         return self.equal(other)
 
     def manhattan_distance(self, other: 'Vec3'):
+        '''Calculates Manhattan distance between two vectors.'''
         return abs(self.x - other.x) + abs(self.y - other.y) + abs(self.z - other.z)
 
 
