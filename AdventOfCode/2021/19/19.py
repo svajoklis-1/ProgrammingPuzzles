@@ -10,6 +10,7 @@ from enum import Enum, auto
 
 import re
 from typing import TextIO
+from multiprocessing import Pool
 
 INFINITY = 9223372036854775805
 
@@ -385,47 +386,53 @@ def generate_remaps():
     return remaps
 
 
+def align_vectors(unaligned: Vec3Map, aligned: Vec3Map, remaps: list[str]) -> Vec3Map:
+    for remap in remaps:
+        vecsb = unaligned.remap(remap)
+        for vecb in vecsb.vectors:
+            for veca in aligned.vectors:
+                translation = veca.subtract(vecb)
+                tvecsb = vecsb.translate(translation)
+                matches = aligned.match_points(tvecsb)
+                if matches == 12:
+                    tvecsb.aligned = True
+                    return tvecsb
+
+    return None
+
+
 def align_scanners(scanners: list[Vec3Map]):
     remaps = generate_remaps()
 
     scanners[0].aligned = True
     left_unaligned = len(scanners) - 1
 
-    while left_unaligned > 0:
-        found = False
-        for unalignedi in range(len(scanners)):
-            if scanners[unalignedi].aligned:
-                continue
-            print(f'Aligning {unalignedi}')
-            for alignedi in range(len(scanners)):
-                if not scanners[alignedi].aligned:
+    with Pool(8) as p:
+        while left_unaligned > 0:
+            found = False
+            for unalignedi in range(len(scanners)):
+                if scanners[unalignedi].aligned:
                     continue
-                print(f'  with {alignedi}')
-                for remap in remaps:
-                    vecsb = scanners[unalignedi].remap(remap)
-                    for vecb in vecsb.vectors:
-                        for veca in scanners[alignedi].vectors:
-                            translation = veca.subtract(vecb)
-                            tvecsb = vecsb.translate(translation)
-                            matches = scanners[alignedi].match_points(tvecsb)
-                            if matches == 12:
-                                found = True
-                                tvecsb.aligned = True
-                                scanners[unalignedi] = tvecsb
-                                break
-                        if found:
-                            break
-                    if found:
-                        break
-                if found:
+                print(f'Aligning {unalignedi}')
+                tasks = []
+                for alignedi in range(len(scanners)):
+                    if not scanners[alignedi].aligned:
+                        continue
+                    print(f'  with {alignedi}')
+                    tasks.append(p.apply_async(align_vectors, [scanners[unalignedi], scanners[alignedi], remaps]))
+
+                results = [res.get() for res in tasks]
+                results = [res for res in results if res]
+                if len(results) > 0:
+                    newly_aligned = results[0]
+                    scanners[unalignedi] = newly_aligned
+                    found = True
+                    print(f'    aligned')
                     break
             if found:
-                print(f'  aligned')
-                break
-        if found:
-            left_unaligned -= 1
-            print(f'Left unaligned {left_unaligned}')
-            print()
+                left_unaligned -= 1
+                print(f'Left unaligned {left_unaligned}')
+                print()
 
 
 def read_scanners(in_file: TextIO):
