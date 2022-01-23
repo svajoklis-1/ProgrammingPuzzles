@@ -40,13 +40,15 @@ class DeterministicDie(Die):
 class Player:
     position: int
     score: int
+    times_won: int
 
     def __init__(self, starting_position: int):
         self.position = starting_position
         self.score = 0
+        self.times_won = 0
 
     def __str__(self):
-        return f'Player(position={self.position}, score={self.score})'
+        return f'Player(position={self.position}, score={self.score}, times_won={self.times_won})'
 
     def __repr__(self):
         return self.__str__()
@@ -103,6 +105,30 @@ def part_one(in_file: TextIO, out_file: TextIO):
     out_file.write(str(min_score * game.die.number_of_rolls))
 
 
+won_iterations = 0
+
+
+def play_round(players: list[Player], active_player: int, rolls: list[int], roll_value: int, number_of_occurrences: list[int], score: int):
+    global won_iterations
+
+    p = players[active_player]
+    p.position = (p.position - 1 + roll_value) % 10 + 1
+    p.score += p.position
+    if p.score >= 21:
+        p.times_won += score
+        won_iterations += 1
+        if won_iterations > 1_000_000:
+            print(f'Player {active_player + 1} won {p.times_won} times')
+            won_iterations = 0
+    else:
+        next_active_player = 0 if active_player == 1 else 1
+        for roll in rolls:
+            play_round(players, next_active_player, rolls, roll,
+                       number_of_occurrences, score * number_of_occurrences[roll])
+    p.score -= p.position
+    p.position = (p.position - 1 - roll_value) % 10 + 1
+
+
 def part_two(in_file: TextIO, out_file: TextIO):
     starting_positions = []
     for line in in_file:
@@ -114,7 +140,27 @@ def part_two(in_file: TextIO, out_file: TextIO):
 
     players = [Player(starting_position) for starting_position in starting_positions]
 
+    possible_rolls = []
+    for a in [1, 2, 3]:
+        for b in [1, 2, 3]:
+            for c in [1, 2, 3]:
+                possible_rolls.append(a + b + c)
+
+    max_roll = max(possible_rolls)
+    number_of_occurrences = [0] * (max_roll + 1)
+    for roll in possible_rolls:
+        number_of_occurrences[roll] += 1
+
+    unique_rolls = []
+    for roll in possible_rolls:
+        if roll not in unique_rolls:
+            unique_rolls.append(roll)
+
+    for roll in unique_rolls:
+        play_round(players, 0, unique_rolls, roll, number_of_occurrences, 1 * number_of_occurrences[roll])
+
     print(players)
+    out_file.write(str(max([players[0].times_won, players[1].times_won])))
 
 
 def main(file_name: str, part: str):
