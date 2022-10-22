@@ -23,22 +23,22 @@ class Fish:
         self.state = self.state + [8] * num_new_fish
 
     def print(self):
-        label = 'Initial state'
+        label = "Initial state"
         if self.day > 0:
-            label = f'After {self.day} days'
+            label = f"After {self.day} days"
 
-        print(f'{label}: {self.state}')
+        print(f"{label}: {self.state}")
 
 
 def part_one(in_file_name):
-    in_file = open(in_file_name, 'r')
-    fish = Fish([int(v) for v in in_file.readline().strip().split(',')])
+    in_file = open(in_file_name, "r")
+    fish = Fish([int(v) for v in in_file.readline().strip().split(",")])
 
     fish.print()
     for i in range(256):
         fish.next_day()
 
-    print('Fish in total: ', len(fish.state))
+    print("Fish in total: ", len(fish.state))
 
 
 class FishSums:
@@ -60,16 +60,16 @@ class FishSums:
         self.counts[8] += last_0
 
     def print(self):
-        label = 'Initial state'
+        label = "Initial state"
         if self.day > 0:
-            label = f'After {self.day} days'
+            label = f"After {self.day} days"
 
-        print(f'{label}: {self.counts}, total: {sum(self.counts)}')
+        print(f"{label}: {self.counts}, total: {sum(self.counts)}")
 
 
 def part_two(in_file_name):
-    in_file = open(in_file_name, 'r')
-    fish = FishSums([int(v) for v in in_file.readline().strip().split(',')])
+    in_file = open(in_file_name, "r")
+    fish = FishSums([int(v) for v in in_file.readline().strip().split(",")])
 
     fish.print()
     for i in range(256):
@@ -77,14 +77,14 @@ def part_two(in_file_name):
         fish.print()
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 06')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 06")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

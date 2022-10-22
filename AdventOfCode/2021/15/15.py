@@ -8,8 +8,11 @@ from enum import Enum
 
 INFINITY = 9223372036854775805
 
-sys.path.append('../../../')
-from util.term_control import TermControl, TermColor  # pylint: disable=wrong-import-position,import-error
+sys.path.append("../../../")
+from util.term_control import (
+    TermControl,
+    TermColor,
+)  # pylint: disable=wrong-import-position,import-error
 
 
 @dataclass
@@ -21,7 +24,7 @@ class Point:
 class CaveMapNode:
     idx: int
     risk_level: int
-    adjacent: list['CaveMapNode']
+    adjacent: list["CaveMapNode"]
     visited: False
 
     def __init__(self, idx, risk_level):
@@ -31,7 +34,7 @@ class CaveMapNode:
         self.visited = False
 
     def __str__(self):
-        return f'Cave({self.idx})'
+        return f"Cave({self.idx})"
 
 
 def node_risk_level(node: CaveMapNode):
@@ -46,7 +49,7 @@ class CaveMap:
     end: CaveMapNode
 
     @staticmethod
-    def from_data(width: int, height: int, data: list[str]) -> 'CaveMap':
+    def from_data(width: int, height: int, data: list[str]) -> "CaveMap":
         cave_map = CaveMap()
         cave_map.width = width
         cave_map.height = height
@@ -152,11 +155,11 @@ def walk(start: CaveMapNode, end: CaveMapNode, cave_map: CaveMap):
                 if neighbor not in open_set:
                     open_set.add(neighbor)
 
-    print('Failed to find path')
+    print("Failed to find path")
 
 
 def part_one(in_file_name):
-    with open(in_file_name, 'r', encoding='utf-8') as in_file:
+    with open(in_file_name, "r", encoding="utf-8") as in_file:
         map_lines = [l.strip() for l in in_file.readlines()]
         width = len(map_lines[0])
         height = len(map_lines)
@@ -167,7 +170,7 @@ def part_one(in_file_name):
 
 
 def part_two(in_file_name):
-    with open(in_file_name, 'r', encoding='utf-8') as in_file:
+    with open(in_file_name, "r", encoding="utf-8") as in_file:
         map_lines = [l.strip() for l in in_file.readlines()]
         raw_width = len(map_lines[0])
         raw_height = len(map_lines)
@@ -189,14 +192,14 @@ def part_two(in_file_name):
         walk(cave_map.start, cave_map.end, cave_map)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 15')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 15")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

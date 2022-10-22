@@ -7,8 +7,11 @@
       "editor.tabSize": 4,
       "editor.formatOnSave": true,
       "editor.insertSpaces": true,
+      "editor.defaultFormatter": "ms-python.black-formatter"
   },
-  "python.linting.pylintEnabled": true,
   "python.linting.enabled": true,
-  "files.insertFinalNewline": false
+  "python.linting.pylintEnabled": true,
+  "files.insertFinalNewline": false,
+  "editor.formatOnSave": true,
+  "python.languageServer": "Pylance"
 }

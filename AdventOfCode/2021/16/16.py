@@ -8,43 +8,46 @@ from enum import Enum
 
 INFINITY = 9223372036854775805
 
-sys.path.append('../../../')
-from util.term_control import TermControl, TermColor  # pylint: disable=wrong-import-position,import-error
+sys.path.append("../../../")
+from util.term_control import (
+    TermControl,
+    TermColor,
+)  # pylint: disable=wrong-import-position,import-error
 
 
 hex_to_bin = {
-    '0': '0000',
-    '1': '0001',
-    '2': '0010',
-    '3': '0011',
-    '4': '0100',
-    '5': '0101',
-    '6': '0110',
-    '7': '0111',
-    '8': '1000',
-    '9': '1001',
-    'A': '1010',
-    'B': '1011',
-    'C': '1100',
-    'D': '1101',
-    'E': '1110',
-    'F': '1111'
+    "0": "0000",
+    "1": "0001",
+    "2": "0010",
+    "3": "0011",
+    "4": "0100",
+    "5": "0101",
+    "6": "0110",
+    "7": "0111",
+    "8": "1000",
+    "9": "1001",
+    "A": "1010",
+    "B": "1011",
+    "C": "1100",
+    "D": "1101",
+    "E": "1110",
+    "F": "1111",
 }
 
 
 class BitStream:
     def __init__(self):
-        self.data = ''
+        self.data = ""
 
     @staticmethod
-    def from_hex_data(hex_data: str) -> 'BitStream':
+    def from_hex_data(hex_data: str) -> "BitStream":
         stream = BitStream()
         for h in hex_data:
             stream.data += hex_to_bin[h]
         return stream
 
     @staticmethod
-    def from_bin_data(bin_data: str) -> 'BitStream':
+    def from_bin_data(bin_data: str) -> "BitStream":
         stream = BitStream()
         stream.data = bin_data
         return stream
@@ -64,7 +67,7 @@ class BitStream:
 class Packet:
     version: int
     type_id: int
-    sub_packets: list['Packet']
+    sub_packets: list["Packet"]
     value: int
     length_type_id: int
 
@@ -75,18 +78,20 @@ class Packet:
         self.value = None
 
     def __str__(self):
-        packets_str = '[' + ', '.join([str(packet) for packet in self.sub_packets]) + ']'
-        return f'Packet(version={self.version}, type_id={self.type_id}, value={self.value}, packets={packets_str})'
+        packets_str = (
+            "[" + ", ".join([str(packet) for packet in self.sub_packets]) + "]"
+        )
+        return f"Packet(version={self.version}, type_id={self.type_id}, value={self.value}, packets={packets_str})"
 
 
 def read_literal(stream: BitStream):
     bits_read = 0
     reading = True
-    literal_bits = ''
+    literal_bits = ""
     while reading:
         bits_read += 5
         bits = stream.take(5)
-        reading = bits[0] == '1'
+        reading = bits[0] == "1"
         literal_bits += bits[1:]
 
     return int(literal_bits, 2)
@@ -125,7 +130,7 @@ def count_versions(packet: Packet) -> int:
 
 
 def part_one(in_file, out_file):
-    with open(in_file_name, 'r', encoding='utf-8') as in_file:
+    with open(in_file_name, "r", encoding="utf-8") as in_file:
         hex_data = in_file.readline().strip()
         stream = BitStream.from_hex_data(hex_data)
         packet = read_packet(stream)
@@ -143,7 +148,9 @@ def evaluate_expression(packet: Packet) -> int:
         case 0:  # sum
             return sum(evaluate_sub_packets(packet.sub_packets))
         case 1:  # product
-            return reduce(lambda a, b: a * b, evaluate_sub_packets(packet.sub_packets), 1)
+            return reduce(
+                lambda a, b: a * b, evaluate_sub_packets(packet.sub_packets), 1
+            )
         case 2:  # min
             return min(evaluate_sub_packets(packet.sub_packets))
         case 3:  # max
@@ -167,19 +174,19 @@ def part_two(in_file, out_file):
 
 
 def main(in_file, part):
-    with open(f'{in_file}.in', 'r', encoding='utf-8') as in_file:
-        with open(f'{in_file}.{part}.out', 'w', encoding='utf-8') as out_file:
+    with open(f"{in_file}.in", "r", encoding="utf-8") as in_file:
+        with open(f"{in_file}.{part}.out", "w", encoding="utf-8") as out_file:
             match part:
-                case 'one':
+                case "one":
                     part_one(in_file, out_file)
-                case 'two':
+                case "two":
                     part_two(in_file, out_file)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 16')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 16")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     main(args.in_file, args.part)

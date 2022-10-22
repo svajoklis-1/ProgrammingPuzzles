@@ -24,7 +24,7 @@ class Map:
 
         map.width = len(lines[0])
         map.height = len(lines)
-        map.data = [int(point) for point in ''.join(lines)]
+        map.data = [int(point) for point in "".join(lines)]
 
         return map
 
@@ -52,7 +52,7 @@ class Map:
 
 
 def part_one(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
     map = Map.from_lines(in_file.readlines())
 
     risk_levels_sum = 0
@@ -82,7 +82,7 @@ def flood_fill_map(map: Map, idx: int):
 
 
 def part_two(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
     map = Map.from_lines(in_file.readlines())
 
     basins = []
@@ -96,14 +96,14 @@ def part_two(in_file_name):
     print(reduce(lambda acc, v: acc * v, basins[-3:]))
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 09')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 09")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

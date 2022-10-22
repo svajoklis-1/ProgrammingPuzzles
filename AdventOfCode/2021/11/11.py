@@ -19,7 +19,7 @@ class Map:
 
         map.width = len(lines[0].strip())
         map.height = len(lines)
-        map.data = [int(data) for data in ''.join([line.strip() for line in lines])]
+        map.data = [int(data) for data in "".join([line.strip() for line in lines])]
         map.reset()
 
         return map
@@ -86,11 +86,11 @@ class Map:
     def print(self):
         for pointi, point in enumerate(self.data):
             if point == 0:
-                print(colorama.Style.BRIGHT + colorama.Fore.CYAN, end='')
+                print(colorama.Style.BRIGHT + colorama.Fore.CYAN, end="")
             else:
-                print(colorama.Style.DIM + colorama.Fore.WHITE, end='')
-            print(point, end='')
-            print(colorama.Style.RESET_ALL, end='')
+                print(colorama.Style.DIM + colorama.Fore.WHITE, end="")
+            print(point, end="")
+            print(colorama.Style.RESET_ALL, end="")
             if pointi % self.width == self.width - 1:
                 print()
 
@@ -99,10 +99,10 @@ class Map:
     def print_pretty(self):
         for pointi, point in enumerate(self.data):
             if point == 0:
-                print(colorama.Style.BRIGHT + colorama.Fore.CYAN + '*', end='')
+                print(colorama.Style.BRIGHT + colorama.Fore.CYAN + "*", end="")
             else:
-                print(colorama.Style.DIM + colorama.Fore.WHITE + '_', end='')
-            print(colorama.Style.RESET_ALL, end='')
+                print(colorama.Style.DIM + colorama.Fore.WHITE + "_", end="")
+            print(colorama.Style.RESET_ALL, end="")
             if pointi % self.width == self.width - 1:
                 print()
 
@@ -110,7 +110,7 @@ class Map:
 
 
 def part_one(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
 
     map = Map.from_lines(in_file.readlines())
     for i in range(100):
@@ -119,7 +119,7 @@ def part_one(in_file_name):
 
 
 def part_two(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
 
     map = Map.from_lines(in_file.readlines())
     map.print_pretty()
@@ -131,14 +131,14 @@ def part_two(in_file_name):
     print(map.tick_num)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 11')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 11")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

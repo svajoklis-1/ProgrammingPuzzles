@@ -2,7 +2,7 @@ import argparse
 
 
 def part_one(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
     num_increased = 0
     last_depth = None
     for reading in in_file:
@@ -22,7 +22,7 @@ def part_one(in_file_name):
 
 
 def part_two(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
 
     depths = []
     num_increased = 0
@@ -48,14 +48,14 @@ def part_two(in_file_name):
     print(num_increased)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 01')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 01")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

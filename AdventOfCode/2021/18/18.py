@@ -12,8 +12,11 @@ import re
 
 INFINITY = 9223372036854775805
 
-sys.path.append('../../../')
-from util.term_control import TermControl, TermColor  # pylint: disable=wrong-import-position,import-error
+sys.path.append("../../../")
+from util.term_control import (
+    TermControl,
+    TermColor,
+)  # pylint: disable=wrong-import-position,import-error
 
 
 class Direction(Enum):
@@ -21,22 +24,22 @@ class Direction(Enum):
     RIGHT = auto()
 
 
-num_re = re.compile(r'(\d+).*')
+num_re = re.compile(r"(\d+).*")
 
 
 class SnailNode:
-    parent: 'SnailPair'
+    parent: "SnailPair"
 
     def __init__(self):
         self.parent = None
 
-    def find_splittable(self) -> 'SnailValue':
+    def find_splittable(self) -> "SnailValue":
         pass
 
     def get_magnitude(self) -> int:
         return 0
 
-    def clone(self) -> 'SnailNode':
+    def clone(self) -> "SnailNode":
         pass
 
 
@@ -48,7 +51,7 @@ class SnailValue(SnailNode):
         self.value = value
 
     def __str__(self):
-        return f'{self.value}'
+        return f"{self.value}"
 
     def get_leaves(self):
         return [self]
@@ -66,9 +69,10 @@ class SnailValue(SnailNode):
 
 
 class SnailPair(SnailNode):
-    '''
+    """
     Represents a single SnailPair of two sides.
-    '''
+    """
+
     left: SnailNode
     right: SnailNode
 
@@ -85,9 +89,9 @@ class SnailPair(SnailNode):
         left = self.left
         right = self.right
 
-        return f'[{left},{right}]'
+        return f"[{left},{right}]"
 
-    def add(self, other: 'SnailPair'):
+    def add(self, other: "SnailPair"):
         result = SnailPair()
 
         result.left = self
@@ -108,8 +112,10 @@ class SnailPair(SnailNode):
 
             splittable = self.find_splittable()
             if splittable:
-                new_pair = SnailPair(SnailValue(floor(splittable.value / 2.0)),
-                                     SnailValue(ceil(splittable.value / 2.0)))
+                new_pair = SnailPair(
+                    SnailValue(floor(splittable.value / 2.0)),
+                    SnailValue(ceil(splittable.value / 2.0)),
+                )
                 splittable.parent.replace(splittable, new_pair)
                 continue
 
@@ -119,18 +125,22 @@ class SnailPair(SnailNode):
     def find_splittable(self):
         return self.left.find_splittable() or self.right.find_splittable()
 
-    def find_explodable(self, depth=0) -> 'SnailPair':
+    def find_explodable(self, depth=0) -> "SnailPair":
         if depth == 3:
             if isinstance(self.left, SnailPair):
                 return self.left
             if isinstance(self.right, SnailPair):
                 return self.right
 
-        result = isinstance(self.left, SnailPair) and self.left.find_explodable(depth + 1)
+        result = isinstance(self.left, SnailPair) and self.left.find_explodable(
+            depth + 1
+        )
         if result:
             return result
 
-        result = isinstance(self.right, SnailPair) and self.right.find_explodable(depth + 1)
+        result = isinstance(self.right, SnailPair) and self.right.find_explodable(
+            depth + 1
+        )
         if result:
             return result
 
@@ -187,7 +197,7 @@ class SnailPairParser:
 
     def read_pair(self):
         char = self.peek_char()
-        if char != '[':
+        if char != "[":
             return None
 
         self.read_char()
@@ -198,20 +208,20 @@ class SnailPairParser:
         number.left.parent = number
 
         char = self.read_char()
-        if char != ',':
-            raise 'Unexpected character, expected ,'
+        if char != ",":
+            raise "Unexpected character, expected ,"
 
         number.right = self.read_node()
         number.right.parent = number
 
         char = self.read_char()
-        if char != ']':
-            raise 'Unexpected character, expected ]'
+        if char != "]":
+            raise "Unexpected character, expected ]"
 
         return number
 
     def read_value(self):
-        num_match = num_re.match(self.string[self.current_index:])
+        num_match = num_re.match(self.string[self.current_index :])
 
         if not num_match:
             return None
@@ -282,19 +292,19 @@ def part_two(in_file: FileIO, out_file: FileIO):
 
 
 def main(file_name, part):
-    with open(f'{file_name}.in', 'r', encoding='utf-8') as in_file:
-        with open(f'{file_name}.{part}.out', 'w', encoding='utf-8') as out_file:
+    with open(f"{file_name}.in", "r", encoding="utf-8") as in_file:
+        with open(f"{file_name}.{part}.out", "w", encoding="utf-8") as out_file:
             match part:
-                case 'one':
+                case "one":
                     part_one(in_file, out_file)
-                case 'two':
+                case "two":
                     part_two(in_file, out_file)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 16')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 16")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     main(args.in_file, args.part)

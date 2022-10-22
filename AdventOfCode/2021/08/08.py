@@ -1,4 +1,4 @@
-'''
+"""
 num 	num_digits 	idx		got
 1		2			0		y
 
@@ -15,7 +15,7 @@ num 	num_digits 	idx		got
 9		6			8		y
 
 8		7			9		y
-'''
+"""
 
 
 import argparse
@@ -27,7 +27,7 @@ def len_key(a):
 
 
 def subtract_string(a, b):
-    return ''.join([l for l in a if l not in b])
+    return "".join([l for l in a if l not in b])
 
 
 def subtract_strings(minuend, strings):
@@ -46,7 +46,7 @@ def are_strings_equal(a, b):
 def build_segments_by_digit(segments):
     segments_by_digit = dict()
     for i in range(10):
-        segments_by_digit[i] = ''
+        segments_by_digit[i] = ""
 
     segments_by_len = dict()
     for i in range(8):
@@ -55,38 +55,42 @@ def build_segments_by_digit(segments):
         segments_by_len[len(segment)].append(segment)
 
     segment_map = dict()
-    for l in 'abcdefg':
-        segment_map[l] = ''
+    for l in "abcdefg":
+        segment_map[l] = ""
 
     segments_by_digit[1] = segments_by_len[2].pop()
     segments_by_digit[7] = segments_by_len[3].pop()
     segments_by_digit[4] = segments_by_len[4].pop()
     segments_by_digit[8] = segments_by_len[7].pop()
 
-    segment_map['a'] = subtract_string(segments_by_digit[7], segments_by_digit[1])
+    segment_map["a"] = subtract_string(segments_by_digit[7], segments_by_digit[1])
 
     for digits in segments_by_len[6]:
-        guess = subtract_strings(digits, [segments_by_digit[1], segments_by_digit[7], segments_by_digit[4]])
+        guess = subtract_strings(
+            digits, [segments_by_digit[1], segments_by_digit[7], segments_by_digit[4]]
+        )
         if len(guess) == 1:
-            segment_map['g'] = guess
+            segment_map["g"] = guess
             segments_by_digit[9] = digits
             segments_by_len[6].remove(digits)
             break
 
-    segment_map['e'] = subtract_string(segments_by_digit[8], segments_by_digit[9])
+    segment_map["e"] = subtract_string(segments_by_digit[8], segments_by_digit[9])
 
     for digits in segments_by_len[6]:
-        guess = subtract_strings(digits, [segments_by_digit[7], segment_map['g'], segment_map['e']])
+        guess = subtract_strings(
+            digits, [segments_by_digit[7], segment_map["g"], segment_map["e"]]
+        )
         if len(guess) == 1:
             segments_by_digit[0] = digits
-            segment_map['b'] = guess
+            segment_map["b"] = guess
             segments_by_len[6].remove(digits)
             break
 
     segments_by_digit[6] = segments_by_len[6].pop()
 
-    segment_map['c'] = subtract_string(segments_by_digit[0], segments_by_digit[6])
-    segment_map['d'] = subtract_string(segments_by_digit[8], segments_by_digit[0])
+    segment_map["c"] = subtract_string(segments_by_digit[0], segments_by_digit[6])
+    segment_map["d"] = subtract_string(segments_by_digit[8], segments_by_digit[0])
 
     for digits in segments_by_len[5]:
         guess = subtract_string(digits, segments_by_digit[6])
@@ -103,7 +107,9 @@ def build_segments_by_digit(segments):
             break
 
     segments_by_digit[3] = segments_by_len[5].pop()
-    segment_map['f'] = subtract_strings(segments_by_digit[8], [segments_by_digit[2], segment_map['b']])
+    segment_map["f"] = subtract_strings(
+        segments_by_digit[8], [segments_by_digit[2], segment_map["b"]]
+    )
 
     return segments_by_digit
 
@@ -114,10 +120,10 @@ def part_one(in_file_name):
     counts = [0] * 10
 
     for line in in_file:
-        [segments, output] = [e.strip() for e in line.split('|')]
-        segments = segments.split(' ')
+        [segments, output] = [e.strip() for e in line.split("|")]
+        segments = segments.split(" ")
         segments.sort(key=len_key)
-        output = output.split(' ')
+        output = output.split(" ")
 
         segments_by_digit = build_segments_by_digit(segments)
 
@@ -137,10 +143,10 @@ def part_two(in_file_name):
     num_sum = 0
 
     for line in in_file:
-        [segments, output] = [e.strip() for e in line.split('|')]
-        segments = segments.split(' ')
+        [segments, output] = [e.strip() for e in line.split("|")]
+        segments = segments.split(" ")
         segments.sort(key=len_key)
-        output = output.split(' ')
+        output = output.split(" ")
 
         segments_by_digit = build_segments_by_digit(segments)
 
@@ -158,14 +164,14 @@ def part_two(in_file_name):
     print(num_sum)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 08')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 08")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

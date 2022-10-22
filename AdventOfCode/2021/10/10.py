@@ -3,23 +3,13 @@ from dataclasses import dataclass
 from functools import reduce
 
 
-pairs = [('(', ')'), ('[', ']'), ('{', '}'), ('<', '>')]
+pairs = [("(", ")"), ("[", "]"), ("{", "}"), ("<", ">")]
 
 
-error_values = {
-    ')': 3,
-    ']': 57,
-    '}': 1197,
-    '>': 25137
-}
+error_values = {")": 3, "]": 57, "}": 1197, ">": 25137}
 
 
-autocomplete_values = {
-    ')': 1,
-    ']': 2,
-    '}': 3,
-    '>': 4
-}
+autocomplete_values = {")": 1, "]": 2, "}": 3, ">": 4}
 
 
 def is_char_closing_for(a, b):
@@ -31,11 +21,11 @@ def is_char_closing_for(a, b):
 
 
 def is_opening_char(char):
-    return char in '([{<'
+    return char in "([{<"
 
 
 def is_closing_char(char):
-    return char in ')]}>'
+    return char in ")]}>"
 
 
 def get_opposite(char):
@@ -48,7 +38,9 @@ def get_opposite(char):
 
 def print_pairs(counts):
     for pair in pairs:
-        print(f'{pair[0]}:{pair[1]} = {counts.get(pair[0], 0)}:{counts.get(pair[1], 0)}')
+        print(
+            f"{pair[0]}:{pair[1]} = {counts.get(pair[0], 0)}:{counts.get(pair[1], 0)}"
+        )
 
 
 def is_line_corrupted(line):
@@ -65,7 +57,7 @@ def is_line_corrupted(line):
 
 
 def part_one(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
     lines = [list(line.strip()) for line in in_file.readlines()]
 
     error_score = 0
@@ -78,7 +70,7 @@ def part_one(in_file_name):
                 continue
 
             if not is_char_closing_for(char, stack[-1]):
-                print(f'Expected {get_opposite(stack[-1])}, but found {char} instead')
+                print(f"Expected {get_opposite(stack[-1])}, but found {char} instead")
                 error_score += error_values[char]
                 break
 
@@ -88,7 +80,7 @@ def part_one(in_file_name):
 
 
 def part_two(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
     lines = [list(line.strip()) for line in in_file.readlines()]
 
     autocomplete_scores = []
@@ -120,14 +112,14 @@ def part_two(in_file_name):
     print(autocomplete_scores[int(len(autocomplete_scores) / 2)])
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 10')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 10")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

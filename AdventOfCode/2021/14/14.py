@@ -6,8 +6,11 @@ from dataclasses import dataclass
 from functools import reduce
 from enum import Enum
 
-sys.path.append('../../../')
-from util.term_control import TermControl, TermColor  # pylint: disable=wrong-import-position,import-error
+sys.path.append("../../../")
+from util.term_control import (
+    TermControl,
+    TermColor,
+)  # pylint: disable=wrong-import-position,import-error
 
 
 @dataclass
@@ -45,17 +48,17 @@ class Polymer:
             i += 1
 
     def __str__(self):
-        return ''.join(self.elements)
+        return "".join(self.elements)
 
 
 def part_one(in_file_name):
-    with open(in_file_name, 'r', encoding='utf-8') as in_file:
+    with open(in_file_name, "r", encoding="utf-8") as in_file:
         polymer_elements = list(in_file.readline().strip())
         polymer = Polymer(polymer_elements)
         in_file.readline()
         while line := in_file.readline():
             line = line.strip()
-            [pair, insert] = line.split(' -> ')
+            [pair, insert] = line.split(" -> ")
             [left, right] = list(pair)
 
             insertion = Insertion(left, right, insert)
@@ -87,7 +90,7 @@ class PolymerTwo:
         self.pairs = {}
 
         for i in range(len(initial_elements) - 1):
-            key = f'{initial_elements[i]}{initial_elements[i + 1]}'
+            key = f"{initial_elements[i]}{initial_elements[i + 1]}"
             self.pairs[key] = self.pairs.get(key, 0) + 1
 
         self.elements = {}
@@ -97,7 +100,7 @@ class PolymerTwo:
         self.insertions = {}
 
     def add_insertion(self, insertion: Insertion):
-        key = f'{insertion.left}{insertion.right}'
+        key = f"{insertion.left}{insertion.right}"
         self.insertions[key] = insertion.insert
 
     def grow(self):
@@ -106,23 +109,23 @@ class PolymerTwo:
             insert = self.insertions.get(pair)
             if insert:
                 self.elements[insert] = self.elements.get(insert, 0) + self.pairs[pair]
-                new_pair_keys = [f'{pair[0]}{insert}', f'{insert}{pair[1]}']
+                new_pair_keys = [f"{pair[0]}{insert}", f"{insert}{pair[1]}"]
                 for new_pair in new_pair_keys:
                     new_pairs[new_pair] = new_pairs.get(new_pair, 0) + self.pairs[pair]
         self.pairs = new_pairs
 
     def __str__(self):
-        return ''.join(self.elements)
+        return "".join(self.elements)
 
 
 def part_two(in_file_name):
-    with open(in_file_name, 'r', encoding='utf-8') as in_file:
+    with open(in_file_name, "r", encoding="utf-8") as in_file:
         polymer_elements = list(in_file.readline().strip())
         polymer = PolymerTwo(polymer_elements)
         in_file.readline()
         while line := in_file.readline():
             line = line.strip()
-            [pair, insert] = line.split(' -> ')
+            [pair, insert] = line.split(" -> ")
             [left, right] = list(pair)
 
             insertion = Insertion(left, right, insert)
@@ -145,14 +148,14 @@ def part_two(in_file_name):
     print(max_value - min_value)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 14')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 14")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

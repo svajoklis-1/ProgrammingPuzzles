@@ -7,7 +7,7 @@ from typing import TextIO
 
 INFINITY = 9223372036854775805
 
-sys.path.append('../../../')
+sys.path.append("../../../")
 
 
 class Die:
@@ -48,7 +48,7 @@ class Player:
         self.times_won = 0
 
     def __str__(self):
-        return f'Player(position={self.position}, score={self.score}, times_won={self.times_won})'
+        return f"Player(position={self.position}, score={self.score}, times_won={self.times_won})"
 
     def __repr__(self):
         return self.__str__()
@@ -108,7 +108,14 @@ def part_one(in_file: TextIO, out_file: TextIO):
 won_iterations = 0
 
 
-def play_round(players: list[Player], active_player: int, rolls: list[int], roll_value: int, number_of_occurrences: list[int], score: int):
+def play_round(
+    players: list[Player],
+    active_player: int,
+    rolls: list[int],
+    roll_value: int,
+    number_of_occurrences: list[int],
+    score: int,
+):
     global won_iterations
 
     p = players[active_player]
@@ -118,13 +125,19 @@ def play_round(players: list[Player], active_player: int, rolls: list[int], roll
         p.times_won += score
         won_iterations += 1
         if won_iterations > 1_000_000:
-            print(f'Player {active_player + 1} won {p.times_won} times')
+            print(f"Player {active_player + 1} won {p.times_won} times")
             won_iterations = 0
     else:
         next_active_player = 0 if active_player == 1 else 1
         for roll in rolls:
-            play_round(players, next_active_player, rolls, roll,
-                       number_of_occurrences, score * number_of_occurrences[roll])
+            play_round(
+                players,
+                next_active_player,
+                rolls,
+                roll,
+                number_of_occurrences,
+                score * number_of_occurrences[roll],
+            )
     p.score -= p.position
     p.position = (p.position - 1 - roll_value) % 10 + 1
 
@@ -157,26 +170,33 @@ def part_two(in_file: TextIO, out_file: TextIO):
             unique_rolls.append(roll)
 
     for roll in unique_rolls:
-        play_round(players, 0, unique_rolls, roll, number_of_occurrences, 1 * number_of_occurrences[roll])
+        play_round(
+            players,
+            0,
+            unique_rolls,
+            roll,
+            number_of_occurrences,
+            1 * number_of_occurrences[roll],
+        )
 
     print(players)
     out_file.write(str(max([players[0].times_won, players[1].times_won])))
 
 
 def main(file_name: str, part: str):
-    with open(f'{file_name}.in', 'r', encoding='utf-8') as in_file:
-        with open(f'{file_name}.{part}.out', 'w', encoding='utf-8') as out_file:
+    with open(f"{file_name}.in", "r", encoding="utf-8") as in_file:
+        with open(f"{file_name}.{part}.out", "w", encoding="utf-8") as out_file:
             match part:
-                case 'one':
+                case "one":
                     part_one(in_file, out_file)
-                case 'two':
+                case "two":
                     part_two(in_file, out_file)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 16')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 16")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     main(args.in_file, args.part)

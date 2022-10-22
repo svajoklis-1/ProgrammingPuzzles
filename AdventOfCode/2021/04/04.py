@@ -51,7 +51,7 @@ def read_tickets(in_file):
         for i in range(4):
             ticket.append(in_file.readline())
 
-        ticket = [[int(n) for n in l.strip().split(' ') if len(n) > 0] for l in ticket]
+        ticket = [[int(n) for n in l.strip().split(" ") if len(n) > 0] for l in ticket]
         ticket_nums = []
         for line in ticket:
             ticket_nums += line
@@ -62,11 +62,11 @@ def read_tickets(in_file):
 
 
 def read_game_numbers(in_file):
-    return [int(n) for n in in_file.readline().strip().split(',')]
+    return [int(n) for n in in_file.readline().strip().split(",")]
 
 
 def part_one(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r", encoding="uft8")
     game_numbers = read_game_numbers(in_file)
     tickets = read_tickets(in_file)
 
@@ -89,35 +89,35 @@ def part_one(in_file_name):
 
 
 def part_two(in_file_name):
-    in_file = open(in_file_name, 'r')
-    game_numbers = read_game_numbers(in_file)
-    tickets = read_tickets(in_file)
+    with open(in_file_name, "r", encoding="utf8") as in_file:
+        game_numbers = read_game_numbers(in_file)
+        tickets = read_tickets(in_file)
 
-    last_winning_ticket: Ticket = None
-    last_winning_num = None
-    for num in game_numbers:
-        for ticket in tickets:
-            if ticket.won:
-                continue
-            ticket.mark(num)
-            if ticket.is_winning():
-                ticket.won = True
-                last_winning_ticket = ticket
-                last_winning_num = num
+        last_winning_ticket: Ticket = None
+        last_winning_num = None
+        for num in game_numbers:
+            for ticket in tickets:
+                if ticket.won:
+                    continue
+                ticket.mark(num)
+                if ticket.is_winning():
+                    ticket.won = True
+                    last_winning_ticket = ticket
+                    last_winning_num = num
 
-    last_winning_sum = last_winning_ticket.get_unmarked_sum()
-    print(last_winning_sum)
-    print(last_winning_num)
+        last_winning_sum = last_winning_ticket.get_unmarked_sum()
+        print(last_winning_sum)
+        print(last_winning_num)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 04')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 04")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)

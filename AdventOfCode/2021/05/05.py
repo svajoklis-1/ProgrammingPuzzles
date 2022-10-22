@@ -17,7 +17,7 @@ class Line:
         self.end = end
 
     def __str__(self):
-        return f'{self.start} -> {self.end}'
+        return f"{self.start} -> {self.end}"
 
 
 class Field:
@@ -26,8 +26,12 @@ class Field:
         self.field = [0 for i in range(field_size.x * field_size.y)]
 
     def mark_line(self, line):
-        x_step = 1 if line.end.x > line.start.x else (-1 if line.end.x < line.start.x else 0)
-        y_step = 1 if line.end.y > line.start.y else (-1 if line.end.y < line.start.y else 0)
+        x_step = (
+            1 if line.end.x > line.start.x else (-1 if line.end.x < line.start.x else 0)
+        )
+        y_step = (
+            1 if line.end.y > line.start.y else (-1 if line.end.y < line.start.y else 0)
+        )
 
         cur_point = line.start.copy()
 
@@ -53,8 +57,8 @@ def find_max_point(lines):
 def read_lines(in_file):
     lines = []
     for coord_line in in_file:
-        points = [p.strip() for p in coord_line.split(' -> ')]
-        points = [[int(c) for c in point.split(',')] for point in points]
+        points = [p.strip() for p in coord_line.split(" -> ")]
+        points = [[int(c) for c in point.split(",")] for point in points]
         line = Line(
             Point(points[0][0], points[0][1]),
             Point(points[1][0], points[1][1]),
@@ -65,7 +69,7 @@ def read_lines(in_file):
 
 
 def part_one(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
     lines = read_lines(in_file)
     lines = [l for l in lines if l.start.x == l.end.x or l.start.y == l.end.y]
 
@@ -82,7 +86,7 @@ def part_one(in_file_name):
 
 
 def part_two(in_file_name):
-    in_file = open(in_file_name, 'r')
+    in_file = open(in_file_name, "r")
     lines = read_lines(in_file)
 
     max_point = find_max_point(lines)
@@ -97,14 +101,14 @@ def part_two(in_file_name):
     print(num_overlap)
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Puzzle 05')
-    parser.add_argument('--part', choices=['one', 'two'], required=True)
-    parser.add_argument('in_file')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Puzzle 05")
+    parser.add_argument("--part", choices=["one", "two"], required=True)
+    parser.add_argument("in_file")
     args = parser.parse_args()
 
     match args.part:
-        case 'one':
+        case "one":
             part_one(args.in_file)
-        case 'two':
+        case "two":
             part_two(args.in_file)
