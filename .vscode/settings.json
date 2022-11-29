@@ -1,17 +1,18 @@
 {
   "[python]": {
-      "gitlens.codeLens.symbolScopes": [
-          "!Module"
-      ],
-      "editor.wordBasedSuggestions": false,
-      "editor.tabSize": 4,
-      "editor.formatOnSave": true,
-      "editor.insertSpaces": true,
-      "editor.defaultFormatter": "ms-python.black-formatter"
+    "gitlens.codeLens.symbolScopes": [
+      "!Module"
+    ],
+    "editor.wordBasedSuggestions": false,
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "python.linting.enabled": true,
   "python.linting.pylintEnabled": true,
   "files.insertFinalNewline": false,
   "editor.formatOnSave": true,
-  "python.languageServer": "Pylance"
+  "python.languageServer": "Pylance",
+  "python.formatting.provider": "black"
 }

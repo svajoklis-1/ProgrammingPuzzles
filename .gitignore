@@ -1,6 +1,8 @@
+.venv
 env
 __pycache__
 *.out
 *.pdb
 *.exe
 target/
+/test

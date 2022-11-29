@@ -14,6 +14,10 @@ To add new project to workspace add path to project folder in root `Cargo.toml`
 
 # Python setup
 
-Python is set up using venv. To activate venv run `activate.bat`
+Python is set up using venv. To install python venv run `py_install.bat`
+
+To activate venv run `py_activate.bat`
 
 Solutions only have one file. Run file directly with `python FILE.py`
+
+Make sure .venv environment is selected in VSCode at the bottom while a .py file is open.
