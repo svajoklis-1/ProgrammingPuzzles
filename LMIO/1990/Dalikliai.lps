@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Debug"/>
+    <Units>
+      <Unit>
+        <Filename Value="Dalikliai.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="24"/>
+        <CursorPos X="40" Y="58"/>
+        <UsageCount Value="25"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="13">
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="12" Column="42"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="31" Column="53" TopLine="18"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="15" Column="15"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="16" Column="23"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="12" Column="34"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="3" Column="41"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="8" Column="24"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="9" Column="5"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="7" Column="22"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="32" Column="5" TopLine="5"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="9" Column="33"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="3" Column="35"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="12" Column="43"/>
+      </Position>
+      <Position>
+        <Filename Value="Dalikliai.lpr"/>
+        <Caret Line="3" Column="53"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
